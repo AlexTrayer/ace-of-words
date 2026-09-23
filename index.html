@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>אס המילים</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Assistant:wght@400;700;800&family=Frank+Ruhl+Libre:wght@300;400;700;900&family=Heebo:wght@400;700;900&family=Karantina:wght@400;700&family=Rubik+Burned&family=Rubik+Wet+Paint&family=Varela+Round&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen" class="screen active">
+      <div class="setup-header-area">
+        <h1 class="main-title">אס המילים</h1>
+      </div>
+
+      <div class="setup-content-area">
+        <div class="setup-section">
+          <div class="setup-title">מספר קבוצות:</div>
+          <div class="teams-options" id="teams-container">
+            <button class="setup-btn team-btn selected" onclick="setTeamsCount(2)">2 קבוצות</button>
+            <button class="setup-btn team-btn" onclick="setTeamsCount(3)">3 קבוצות</button>
+            <button class="setup-btn team-btn" onclick="setTeamsCount(4)">4 קבוצות</button>
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <div class="setup-title">משך סיבוב:</div>
+          <div class="time-options" id="time-container"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary start-btn" onclick="startGame()">התחל</button>
+    </div>
+
+    <!-- COUNTDOWN SCREEN -->
+    <div id="countdown-screen" class="screen">
+      <div class="countdown-hint" id="countdown-team-name">קבוצה, תורכם!</div>
+      <div id="countdown-val" class="countdown-number">3</div>
+      <div class="countdown-hint">תעבירו לקבוצה הבאה</div>
+    </div>
+
+    <!-- MAIN GAME SCREEN -->
+    <div id="game-screen" class="screen">
+      
+      <div class="card-container">
+        <div id="card" class="card">
+          
+          <div class="card-inner-header" id="card-timer-header">
+            <span id="timer-display">00:00</span>
+          </div>
+
+          <div id="card-word" class="card-word">מילה</div>
+
+          <div class="card-inner-footer">
+            <span class="hint-success">ימינה: הצלחה →</span>
+            <span class="hint-fail">← שמאלה: טעות</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="action-btn success" onclick="handleCardAction(true, true)">הצלחה</button>
+        <button class="action-btn pass" onclick="handleCardAction(false, true)">טעות</button>
+      </div>
+    </div>
+
+    <!-- JOKER ROUND SCREEN -->
+    <div id="joker-screen" class="screen">
+      <div class="card-container joker-container">
+        <div id="joker-card" class="card joker-card-style">
+          
+          <div class="joker-card-top">
+            <h1 class="joker-title">סיבוב ג'וקר</h1>
+            <div class="joker-subtitle" id="joker-instructions">קבוצה מסבירה בפנטומימה!<br>הראשון שמנחש זוכה בנקודה.</div>
+            <div class="joker-words-counter">נותרו: <span id="joker-words-left">5</span> מילים</div>
+          </div>
+          
+          <div id="joker-card-word" class="card-word joker-word">מילה</div>
+          
+          <div class="joker-card-bottom">
+            <div class="joker-teams-buttons" id="joker-teams-buttons">
+            </div>
+            <!-- Removed the emoji -->
+            <button class="joker-skip-btn" onclick="handleJokerSkip()">החלף מילה</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP SCREEN -->
+    <div id="map-screen" class="screen map-mode">
+      <!-- Removed the emoji from the back button -->
+      <button class="map-back-btn" onclick="hideMap()">חזור</button>
+      <div id="map-path-container">
+        <!-- Tokens will be injected here dynamically -->
+      </div>
+    </div>
+
+    <!-- ROUND SUMMARY SCREEN -->
+    <div id="summary-screen" class="screen">
+      <div>
+        <h1 id="summary-title" style="color: var(--team-text-color); text-shadow: var(--team-text-shadow, none);">נגמר הזמן!</h1>
+        <div class="summary-subtitle">סיכום נקודות לסיבוב זה</div>
+      </div>
+
+      <div class="results-box">
+        <div class="result-row success-row">
+          <span class="result-label">הצלחות (+1)</span>
+          <span id="final-success" class="result-val">0</span>
+        </div>
+        <div class="result-row fail-row">
+          <span class="result-label">טעויות (-1)</span>
+          <span id="final-fail" class="result-val">0</span>
+        </div>
+        <div class="result-row total">
+          <span class="result-label">סה"כ לסיבוב</span>
+          <span id="final-total" class="result-val" style="color: var(--team-text-color);">0</span>
+        </div>
+      </div>
+
+      <div class="summary-actions">
+        <button class="btn btn-dynamic-primary" onclick="startNextTurn()">התחל סיבוב הבא</button>
+        <div class="actions-grid-2">
+          <button class="btn btn-dynamic-secondary" onclick="showScoreboard()">לוח תוצאות</button>
+          <!-- Removed map emoji -->
+          <button class="btn btn-map" onclick="showMap('summary-screen')">מפת התקדמות</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL SCOREBOARD SCREEN -->
+    <div id="scoreboard-screen" class="screen">
+      <div class="setup-header-area" style="margin-top: 20px; margin-bottom: 20px;">
+        <h1 class="scoreboard-title">מצב הנקודות</h1>
+      </div>
+
+      <div id="scores-list" class="results-box" style="width: 100%;"></div>
+
+      <div class="summary-actions" style="margin-top: auto;">
+        <div class="actions-grid-2">
+          <button class="btn btn-neutral-dark" onclick="returnToSummary()">חזור לסיכום</button>
+          <!-- Removed map emoji -->
+          <button class="btn btn-map" onclick="showMap('scoreboard-screen')">מפת התקדמות</button>
+        </div>
+        <button class="btn btn-secondary" onclick="resetFullGame()">סיום משחק (ערבוב מחדש)</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
